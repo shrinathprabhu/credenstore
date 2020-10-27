@@ -16,35 +16,46 @@
       <v-spacer></v-spacer>
 
       <div class="d-flex">
-        <v-btn icon @click.stop="dark = !dark" dark>
-          <v-icon v-if="dark">mdi-brightness-7</v-icon>
-          <v-icon v-else>mdi-brightness-4</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              @click.stop="dark = !dark"
+              dark
+              v-on="on"
+              v-bind="attrs"
+            >
+              <v-icon>{{
+                dark ? "mdi-brightness-7" : "mdi-brightness-4"
+              }}</v-icon>
+            </v-btn>
+          </template>
+          <span>{{
+            dark ? "Switch to light mode" : "Switch to dark mode"
+          }}</span>
+        </v-tooltip>
       </div>
     </v-app-bar>
 
     <v-main>
-      <landing-description vuetifyClass="mt-10 pl-10 pr-10" />
-      <HelloWorld />
+      <landing-page />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
-import LandingDescription from "./components/landing-description.vue";
+import LandingPage from "./views/landing-page.vue";
 
 export default {
   name: "App",
 
   components: {
-    HelloWorld,
-    LandingDescription,
+    LandingPage,
   },
 
   mounted: function () {
     document.title = "Crendenshare";
-    this.dark = localStorage.getItem("dark") || false;
+    this.dark = localStorage.getItem("dark") || true;
   },
 
   data: () => ({
@@ -55,6 +66,7 @@ export default {
   watch: {
     dark() {
       this.$vuetify.theme.dark = this.dark;
+      localStorage.setItem("dark", this.dark);
     },
   },
 };
