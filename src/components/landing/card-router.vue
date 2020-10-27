@@ -15,6 +15,8 @@
         v-on="on"
         v-bind="attrs"
         :class="crClass ? crClass : ''"
+        @click.stop="emitClickEvent"
+        ripple
       >
         <div class="mt-2">
           <v-icon v-if="icon" size="80px">{{ icon }}</v-icon>
@@ -32,5 +34,10 @@
 export default {
   name: "card-router",
   props: ["name", "description", "icon", "crClass"],
+  methods: {
+    emitClickEvent() {
+      this.$emit("crClick");
+    },
+  },
 };
 </script>
