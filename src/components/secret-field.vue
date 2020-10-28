@@ -5,6 +5,11 @@
     outlined
     :label="label"
     :append-icon="secretIcon"
+    v-model="secret"
+    @keyup.stop="$emit('change', secret)"
+    :hint="hint"
+    :error-messages="state.error ? state.message : ''"
+    :success-messages="state.success ? state.message : ''"
   >
     <template slot="append">
       <v-tooltip bottom color="primary">
@@ -27,12 +32,16 @@
 <script>
 export default {
   name: "secret-field",
-  props: ["label"],
+  props: ["label", "hint", "state"],
   data: () => ({
     secretType: "password",
     secretIcon: "mdi-lock",
     secretMessage: "Click to show password",
+    secret: "",
   }),
+  mounted() {
+    this.secret = this.value;
+  },
   methods: {
     togglePasswordType() {
       if (this.secretType === "password") {
