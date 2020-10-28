@@ -69,6 +69,7 @@
 import AppBar from "../components/appbar.vue";
 import SecretField from "../components/secret-field.vue";
 import PasswordStrength from "../mixins/password-strength.mixin";
+import { extractFileContent } from "../utils/file";
 export default {
   name: "upload-creds",
   components: {
@@ -148,11 +149,17 @@ export default {
           "Resolve password confirmation issues to continue"
         );
       } else {
-        console.log(this.creds, this.credsPath);
+        if (this.creds) {
+          console.log(this.creds);
+        }
+        if (this.credsFile) {
+          extractFileContent(this.credsFile);
+        }
       }
     },
     captureFilePath(e) {
-      console.log(e.target.files);
+      this.credsFile = e.target.files[0];
+      extractFileContent(this.credsFile);
     },
   },
   updated: function () {},
