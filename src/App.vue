@@ -16,11 +16,13 @@
 </style>
 
 <script>
+import firebase from "./utils/firebase";
 export default {
   name: "App",
 
   mounted: function () {
     document.title = "Credenshare";
+    firebase.collection("sample").add({ sample: "yeah" });
   },
 };
 </script>

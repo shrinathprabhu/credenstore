@@ -9,14 +9,14 @@
             icon="mdi-lock"
             name="Store Credentials"
             description="Encrypt your credentials and store it on cloud"
-            @crClick="handleClick('SC')"
+            navigateTo="store"
           ></card-router>
           <card-router
             crClass="ml-10"
             icon="mdi-key-variant"
             name="Retrieve Credentials"
             description="Download your credentials from cloud and decrypt it"
-            @crClick="handleClick('RC')"
+            navigateTo="retrieve"
           ></card-router>
         </v-row>
       </v-container>
@@ -36,10 +36,6 @@ export default {
     AppBar,
   },
   data: () => ({}),
-  methods: {
-    handleClick(v) {
-      console.log(v);
-    },
-  },
+  methods: {},
 };
 </script>

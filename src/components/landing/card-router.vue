@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip bottom>
+  <v-tooltip bottom color="primary">
     <template v-slot:activator="{ on, attrs }">
       <v-card
         elevation="0"
@@ -15,7 +15,7 @@
         v-on="on"
         v-bind="attrs"
         :class="crClass ? crClass : ''"
-        @click.stop="emitClickEvent"
+        @click.stop="$router.push(navigateTo)"
         ripple
       >
         <div class="mt-2">
@@ -33,11 +33,6 @@
 <script>
 export default {
   name: "card-router",
-  props: ["name", "description", "icon", "crClass"],
-  methods: {
-    emitClickEvent() {
-      this.$emit("crClick");
-    },
-  },
+  props: ["name", "description", "icon", "navigateTo", "crClass"],
 };
 </script>

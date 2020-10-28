@@ -10,14 +10,24 @@ const routes = [
     name: 'Landing Page',
     component: LandingPage
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => 
-  // },
+  {
+    path: '/store',
+    name: 'Store creds page',
+    // route level code-splitting
+    // this generates a separate chunk (about.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import('../views/upload-creds.vue')
+  },
+  {
+    path: '/retrieve',
+    name: 'Retrieve creds page',
+    component: () => import('../views/download-creds.vue')
+  },
+  {
+    path: '/retrieve/:id',
+    name: 'Retrieve creds page with id',
+    component: () => import('../views/download-creds.vue')
+  },
   {
     path: '*',
     name: 'Redirect Invalid Paths to landing page',

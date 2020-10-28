@@ -1,6 +1,10 @@
 <template>
   <v-app-bar app color="primary" dark>
-    <div class="d-flex align-center">
+    <div
+      class="d-flex align-center"
+      style="cursor: pointer"
+      @click.stop="navigateToHome"
+    >
       <v-img
         alt="Credenshare logo"
         contain
@@ -15,7 +19,7 @@
     <v-spacer></v-spacer>
 
     <div class="d-flex">
-      <v-tooltip bottom>
+      <v-tooltip bottom color="primary">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon @click.stop="dark = !dark" dark v-on="on" v-bind="attrs">
             <v-icon>{{
@@ -36,12 +40,26 @@ export default {
     dark: false,
   }),
   mounted: function () {
-    this.dark = localStorage.getItem("dark") || true;
+    this.dark = this.strToBool(localStorage.getItem("dark"));
+  },
+  methods: {
+    navigateToHome() {
+      if (window.location.pathname !== "/") {
+        this.$router.push("/");
+      }
+    },
+    strToBool(str) {
+      if (str) {
+        if (str === "false" || str === "0") {
+          return false;
+        } else return true;
+      } else return false;
+    },
   },
   watch: {
     dark() {
       this.$vuetify.theme.dark = this.dark;
-      localStorage.setItem("dark", this.dark);
+      localStorage.setItem("dark", String(this.dark));
     },
   },
 };
