@@ -10,7 +10,7 @@
                 readonly
                 dense
                 outlined
-                label="Unique Id"
+                label="Store Id"
                 :value="uniqueId"
               >
                 <template slot="append">
@@ -20,12 +20,12 @@
                         v-on="on"
                         v-bind="attrs"
                         style="cursor: pointer"
-                        @click.stop="copyUniqueIdToClipboard"
+                        @click.stop="copyToClipboard(uniqueId)"
                       >
                         mdi-content-copy
                       </v-icon>
                     </template>
-                    <span>Click to copy id</span>
+                    <span>Click to copy store id</span>
                   </v-tooltip>
                 </template>
               </v-text-field>
@@ -76,6 +76,83 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-dialog v-model="showDialog" width="320px">
+        <v-card>
+          <v-card-title
+            class="headline"
+            style="background-color: #55af51; color: white"
+          >
+            <span>Retrieval Info</span>
+            <v-spacer />
+            <v-btn icon @click="showDialog = false" dark>
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </v-card-title>
+
+          <v-card-text>
+            <div class="my-2 text-subtitle-2">
+              Your encrypted credentials are stored in cloud successfully
+            </div>
+            <div class="text-subtitle-1 my-2">
+              Enter the below ID in retrieve page
+            </div>
+            <v-text-field
+              dense
+              outlined
+              readonly
+              label="Retrieve ID"
+              v-model="idToRetrieve"
+              hide-details
+            >
+              <template slot="append-outer">
+                <v-tooltip bottom color="primary">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      v-on="on"
+                      v-bind="attrs"
+                      style="cursor: pointer"
+                      @click.stop="copyToClipboard(idToRetrieve)"
+                    >
+                      mdi-content-copy
+                    </v-icon>
+                  </template>
+                  <span>Click to copy retrieve id</span>
+                </v-tooltip>
+              </template>
+            </v-text-field>
+            <div class="text-center text-h5 mt-3 mr-3">OR</div>
+            <div class="text-subtitle-1 my-2">
+              Visit the below url to retrieve the data
+            </div>
+            <v-textarea
+              dense
+              outlined
+              readonly
+              label="URL"
+              v-model="linkToRetrieve"
+              hide-details
+              no-resize
+              rows="3"
+            >
+              <template slot="append-outer">
+                <v-tooltip bottom color="primary">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      v-on="on"
+                      v-bind="attrs"
+                      style="cursor: pointer"
+                      @click.stop="copyToClipboard(linkToRetrieve)"
+                    >
+                      mdi-content-copy
+                    </v-icon>
+                  </template>
+                  <span>Click to copy retrieve link</span>
+                </v-tooltip>
+              </template>
+            </v-textarea>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
       <v-snackbar
         v-model="snackbarState.show"
         timeout="5000"
@@ -84,7 +161,7 @@
         <strong>{{ snackbarState.message }}</strong>
 
         <template v-slot:action="{ attrs }">
-          <v-btn icon text v-bind="attrs" @click="snackbarState.show = false">
+          <v-btn icon v-bind="attrs" @click="snackbarState.show = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </template>
@@ -147,6 +224,9 @@ export default {
     uniqueId: "",
     showOverlay: false,
     overlayText: "",
+    linkToRetrieve: "",
+    idToRetrieve: "",
+    showDialog: false,
   }),
   methods: {
     setPassword(v) {
@@ -241,12 +321,13 @@ export default {
         .set(uploadData)
         .then(() => {
           this.showOverlay = false;
-          this.showSnackbar(
-            false,
-            false,
-            `Encrypted ${uploadType} uploaded to cloud`,
-            "success"
-          );
+          // this.showSnackbar(
+          //   false,
+          //   false,
+          //   `Encrypted ${uploadType} uploaded to cloud`,
+          //   "success"
+          // );
+          this.displayRetrievalInfo();
           this.clearFields();
         })
         .catch((err) => {
@@ -258,6 +339,12 @@ export default {
             "Couldn't upload encrypted credentials to cloud. Try again"
           );
         });
+    },
+    displayRetrievalInfo() {
+      this.idToRetrieve = this.uniqueId;
+      this.linkToRetrieve =
+        window.location.origin + "/retrieve/" + this.idToRetrieve;
+      this.showDialog = true;
     },
     captureFilePath(e) {
       this.creds = "";
@@ -289,7 +376,7 @@ export default {
         }
       }
     },
-    copyUniqueIdToClipboard() {
+    copyToClipboard(value) {
       if (!navigator.clipboard) {
         this.showSnackbar(
           true,
@@ -298,7 +385,7 @@ export default {
         );
       } else {
         navigator.clipboard
-          .writeText(this.uniqueId)
+          .writeText(value)
           .then(() => {
             this.showSnackbar(false, true, "Copied to clipboard", "success");
           })
