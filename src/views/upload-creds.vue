@@ -247,6 +247,7 @@ export default {
             `Encrypted ${uploadType} uploaded to cloud`,
             "success"
           );
+          this.clearFields();
         })
         .catch((err) => {
           console.error(err);
@@ -319,6 +320,11 @@ export default {
         this.$refs.upload.$refs.input.type = "file";
       }
       this.credsFile = null;
+    },
+    clearFields() {
+      this.uniqueId = shortid();
+      this.creds = "";
+      this.clearFileInput();
     },
   },
   mounted: function () {

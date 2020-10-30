@@ -4,6 +4,7 @@
     dense
     outlined
     :label="label"
+    :ref="label"
     :append-icon="secretIcon"
     v-model="secret"
     @keyup.stop="$emit('change', secret)"
@@ -39,8 +40,8 @@ export default {
     secretMessage: "Click to show password",
     secret: "",
   }),
-  mounted() {
-    this.secret = this.value;
+  mounted: function () {
+    this.$refs[this.label].$refs.input.onpaste = (e) => e.preventDefault();
   },
   methods: {
     togglePasswordType() {
