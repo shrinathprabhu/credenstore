@@ -13,7 +13,7 @@
         width="32"
       />
 
-      <h3 class="text-h5 ml-3">Credenshare</h3>
+      <h3 class="text-h5 ml-3">{{ title }}</h3>
     </div>
 
     <v-spacer></v-spacer>
@@ -36,11 +36,13 @@
 <script>
 export default {
   name: "appbar",
+  props: ["title"],
   data: () => ({
     dark: false,
   }),
   mounted: function () {
     this.dark = this.strToBool(localStorage.getItem("dark"));
+    document.title = this.title;
   },
   methods: {
     navigateToHome() {

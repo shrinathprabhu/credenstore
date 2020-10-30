@@ -1,7 +1,19 @@
 export function extractFileContent(file) {
-    const reader = new FileReader();
-    reader.addEventListener('load', event => {
-        console.log(event.target.result);
+    return new Promise((resolve, reject) => {
+        try {
+            const reader = new FileReader();
+            reader.addEventListener('load', event => {
+                return resolve(
+                    {
+                        name: file.name,
+                        type: file.type,
+                        content: event.target.result,
+                    }
+                );
+            });
+            reader.readAsBinaryString(file);
+        } catch (e) {
+            return reject(e);
+        }
     });
-    reader.readAsBinaryString(file);
 }

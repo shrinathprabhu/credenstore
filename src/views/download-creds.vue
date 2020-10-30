@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <app-bar />
+    <app-bar title="Credenshare Retrieve" />
   </v-app>
 </template>
 

@@ -1,11 +1,34 @@
 <template>
   <v-app>
-    <app-bar />
+    <app-bar title="Credenshare Store" />
     <v-main style="width: 100% !important">
       <v-container class="mt-5">
         <v-row class="justify-center">
           <v-col cols="8">
             <form>
+              <v-text-field
+                readonly
+                dense
+                outlined
+                label="Unique Id"
+                :value="uniqueId"
+              >
+                <template slot="append">
+                  <v-tooltip bottom color="primary">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        v-on="on"
+                        v-bind="attrs"
+                        style="cursor: pointer"
+                        @click.stop="copyUniqueIdToClipboard"
+                      >
+                        mdi-content-copy
+                      </v-icon>
+                    </template>
+                    <span>Click to copy id</span>
+                  </v-tooltip>
+                </template>
+              </v-text-field>
               <secret-field
                 label="Enter encryption password"
                 @change="setPassword"
@@ -33,6 +56,7 @@
               <v-file-input
                 :accept="fileTypes.join(',')"
                 outlined
+                dense
                 label="Upload credentials file"
                 prepend-icon=""
                 append-icon="mdi-paperclip"
@@ -52,7 +76,11 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-snackbar v-model="snackbarState.show" timeout="5000" color="error">
+      <v-snackbar
+        v-model="snackbarState.show"
+        timeout="5000"
+        :color="snackbarState.color"
+      >
         <strong>{{ snackbarState.message }}</strong>
 
         <template v-slot:action="{ attrs }">
@@ -62,19 +90,24 @@
         </template>
       </v-snackbar>
     </v-main>
+    <overlay-loader v-if="showOverlay" :loadingText="overlayText" />
   </v-app>
 </template>
 
 <script>
 import AppBar from "../components/appbar.vue";
 import SecretField from "../components/secret-field.vue";
+import OverlayLoader from "../components/overlay-loader.vue";
 import PasswordStrength from "../mixins/password-strength.mixin";
 import { extractFileContent } from "../utils/file";
+import shortid from "shortid";
+// import { hideCreds } from "../utils/triplesec";
 export default {
   name: "upload-creds",
   components: {
     AppBar,
     SecretField,
+    OverlayLoader,
   },
   mixins: [PasswordStrength],
   data: () => ({
@@ -114,6 +147,9 @@ export default {
     },
     creds: "",
     credsFile: {},
+    uniqueId: "",
+    showOverlay: false,
+    overlayText: "",
   }),
   methods: {
     setPassword(v) {
@@ -129,11 +165,12 @@ export default {
       obj.success = success;
       obj.message = message;
     },
-    showSnackbar(error, success, message) {
+    showSnackbar(error, success, message, color) {
       this.snackbarState.show = true;
       this.snackbarState.error = error;
       this.snackbarState.success = success;
       this.snackbarState.message = message;
+      this.snackbarState.color = color || "error";
     },
     encryptAndUpload() {
       if (this.password.length === 0) {
@@ -158,38 +195,66 @@ export default {
       }
     },
     captureFilePath(e) {
+      this.creds = "";
       this.credsFile = e.target.files[0];
-      extractFileContent(this.credsFile);
     },
-  },
-  updated: function () {},
-  watch: {
-    password() {
-      if (this.confirmPasswordState.dirty) {
-        if (this.passwordState.error) {
+    confirmPasswordStateVerification() {
+      if (this.passwordState.error) {
+        this.setPasswordState(
+          this.confirmPasswordState,
+          true,
+          false,
+          "Resolve password errors before confirming"
+        );
+      } else {
+        if (this.confirmPassword !== this.password) {
           this.setPasswordState(
             this.confirmPasswordState,
             true,
             false,
-            "Resolve password errors before confirming"
+            "Passwords must match"
           );
         } else {
-          if (this.confirmPassword !== this.password) {
-            this.setPasswordState(
-              this.confirmPasswordState,
-              true,
-              false,
-              "Passwords must match"
-            );
-          } else {
-            this.setPasswordState(
-              this.confirmPasswordState,
-              false,
-              true,
-              "Awesome"
-            );
-          }
+          this.setPasswordState(
+            this.confirmPasswordState,
+            false,
+            true,
+            "Awesome"
+          );
         }
+      }
+    },
+    copyUniqueIdToClipboard() {
+      if (!navigator.clipboard) {
+        this.showSnackbar(
+          true,
+          false,
+          "Copying to clipboard is not supported in your browser"
+        );
+      } else {
+        navigator.clipboard
+          .writeText(this.uniqueId)
+          .then(() => {
+            this.showSnackbar(false, true, "Copied to clipboard", "success");
+          })
+          .catch((e) => {
+            console.error(e);
+            this.showSnackbar(
+              true,
+              false,
+              "Copying to clipboard failed. Try again"
+            );
+          });
+      }
+    },
+  },
+  mounted: function () {
+    this.uniqueId = shortid();
+  },
+  watch: {
+    password() {
+      if (this.confirmPasswordState.dirty) {
+        this.confirmPasswordStateVerification();
       }
       if (this.password.length === 0) {
         this.setPasswordState(
@@ -220,28 +285,18 @@ export default {
       }
     },
     confirmPassword() {
-      if (this.passwordState.error) {
-        this.setPasswordState(
-          this.confirmPasswordState,
-          true,
-          false,
-          "Resolve password errors before confirming"
-        );
-      } else {
-        if (this.confirmPassword !== this.password) {
-          this.setPasswordState(
-            this.confirmPasswordState,
-            true,
-            false,
-            "Passwords must match"
-          );
-        } else {
-          this.setPasswordState(
-            this.confirmPasswordState,
-            false,
-            true,
-            "Awesome"
-          );
+      this.confirmPasswordStateVerification();
+    },
+    creds() {
+      if (this.creds.length > 0) {
+        if (this.credsFile) {
+          this.$refs.upload.reset();
+          this.$refs.upload.$refs.input.value = "";
+          if (!/safari/i.test(navigator.userAgent)) {
+            this.$refs.upload.$refs.input.type = "";
+            this.$refs.upload.$refs.input.type = "file";
+          }
+          this.credsFile = null;
         }
       }
     },
