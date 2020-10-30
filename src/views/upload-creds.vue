@@ -113,10 +113,6 @@ export default {
   mixins: [PasswordStrength],
   data: () => ({
     fileTypes: [
-      ".env",
-      ".env.local",
-      ".env.test",
-      ".env.pro",
       ".txt",
       ".config.js",
       ".json",
@@ -339,6 +335,13 @@ export default {
           true,
           false,
           "Please enter a password"
+        );
+      } else if (this.password.toLowerCase() === this.uniqueId.toLowerCase()) {
+        this.setPasswordState(
+          this.passwordState,
+          true,
+          false,
+          "Password should not be similar to unique id"
         );
       } else {
         let strength = this.measurePasswordStrength(this.password);
