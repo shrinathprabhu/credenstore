@@ -101,7 +101,8 @@ import OverlayLoader from "../components/overlay-loader.vue";
 import PasswordStrength from "../mixins/password-strength.mixin";
 import { extractFileContent } from "../utils/file";
 import shortid from "shortid";
-// import { hideCreds } from "../utils/triplesec";
+import { hideCreds } from "../utils/triplesec";
+import firebase from "../utils/firebase";
 export default {
   name: "upload-creds",
   components: {
@@ -186,13 +187,80 @@ export default {
           "Resolve password confirmation issues to continue"
         );
       } else {
+        this.showOverlay = true;
         if (this.creds) {
-          console.log(this.creds);
+          this.overlayText = "Encrpyting credentials...";
+          hideCreds(this.creds, this.password)
+            .then((encryptedCreds) => {
+              this.overlayText = "Credentials encrypted.";
+              this.upload(encryptedCreds);
+            })
+            .catch((e) => {
+              console.error(e);
+              this.showOverlay = false;
+              this.showSnackbar(
+                false,
+                false,
+                "Failed to encrypt data. Try again"
+              );
+            });
         }
         if (this.credsFile) {
-          extractFileContent(this.credsFile);
+          this.overlayText = "Extracting file content...";
+          extractFileContent(this.credsFile).then((file) => {
+            this.overlayText = "Encrypting file content...";
+            hideCreds(file.content, this.password)
+              .then((encryptedCreds) => {
+                this.overlayText = "File content encrypted.";
+                this.upload(encryptedCreds, file);
+              })
+              .catch((e) => {
+                console.error(e);
+                this.showOverlay = false;
+                this.showSnackbar(
+                  false,
+                  false,
+                  "Failed to encrypt data. Try again"
+                );
+              });
+          });
         }
       }
+    },
+    upload(encryptedCreds, file) {
+      let uploadType = file ? "file content" : "credentials";
+      this.overlayText = `Uploading encrypted ${uploadType} to cloud...`;
+      let uploadData = {};
+      uploadData.encryptedCreds = encryptedCreds;
+      if (file) {
+        uploadData.file = true;
+        uploadData.metadata = {
+          name: file.name,
+          type: file.type,
+        };
+      }
+      firebase
+        .collection("credentials")
+        .doc(this.uniqueId)
+        .set(uploadData)
+        .then(() => {
+          this.showOverlay = false;
+          this.showSnackbar(
+            false,
+            false,
+            `Encrypted ${uploadType} uploaded to cloud`,
+            "success"
+          );
+        })
+        .catch((err) => {
+          console.error(err);
+          this.showOverlay = false;
+          this.showSnackbar(
+            false,
+            false,
+            "Couldn't upload encrypted credentials to cloud. Try again"
+          );
+        });
     },
     captureFilePath(e) {
       this.creds = "";
@@ -247,6 +315,15 @@ export default {
           });
       }
     },
+    clearFileInput() {
+      this.$refs.upload.reset();
+      this.$refs.upload.$refs.input.value = "";
+      if (!/safari/i.test(navigator.userAgent)) {
+        this.$refs.upload.$refs.input.type = "";
+        this.$refs.upload.$refs.input.type = "file";
+      }
+      this.credsFile = null;
+    },
   },
   mounted: function () {
     this.uniqueId = shortid();
@@ -290,13 +367,7 @@ export default {
     creds() {
       if (this.creds.length > 0) {
         if (this.credsFile) {
-          this.$refs.upload.reset();
-          this.$refs.upload.$refs.input.value = "";
-          if (!/safari/i.test(navigator.userAgent)) {
-            this.$refs.upload.$refs.input.type = "";
-            this.$refs.upload.$refs.input.type = "file";
-          }
-          this.credsFile = null;
+          this.clearFileInput();
         }
       }
     },

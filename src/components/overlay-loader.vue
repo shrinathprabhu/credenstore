@@ -1,8 +1,10 @@
 <template>
   <v-overlay z-index="1000">
-    <v-progress-circular indeterminate color="primary" width="8" size="128" />
+    <v-row class="justify-center">
+      <v-progress-circular indeterminate color="primary" width="8" size="96" />
+    </v-row>
     <div class="text-center mt-5">
-      <span class="text-h5">{{ loadingText }}</span>
+      <span>{{ loadingText }}</span>
     </div>
   </v-overlay>
 </template>
