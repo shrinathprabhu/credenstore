@@ -1,4 +1,4 @@
-# credenshare
+# credenstore
 
 ## Project setup
 ```

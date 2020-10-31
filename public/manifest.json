@@ -1,6 +1,6 @@
 {
-  "short_name": "Credenshare",
-  "name": "Credenshare: Store your credentials safely on cloud and share it with your colleagues",
+  "short_name": "Credenstore",
+  "name": "Credenstore: Store and retrieve your credentials safely on cloud",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

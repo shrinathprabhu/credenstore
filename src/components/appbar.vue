@@ -6,7 +6,7 @@
       @click.stop="navigateToHome"
     >
       <v-img
-        alt="Credenshare logo"
+        alt="Credenstore logo"
         contain
         src="@/assets/logo.png"
         transition="scale-transition"
