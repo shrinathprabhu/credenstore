@@ -46,7 +46,7 @@ export default {
     dark: false,
   }),
   mounted() {
-    this.dark = this.strToBool(localStorage.getItem("dark"));
+    this.dark = this.strToBool(localStorage.getItem("dark")) || true;
     document.title = this.title;
   },
   methods: {
