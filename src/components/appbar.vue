@@ -18,18 +18,23 @@
 
     <v-spacer></v-spacer>
 
-    <div class="d-flex">
-      <v-tooltip bottom color="primary">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn icon @click.stop="dark = !dark" dark v-on="on" v-bind="attrs">
-            <v-icon>{{
-              dark ? "mdi-brightness-7" : "mdi-brightness-4"
-            }}</v-icon>
-          </v-btn>
-        </template>
-        <span>{{ dark ? "Switch to light mode" : "Switch to dark mode" }}</span>
-      </v-tooltip>
-    </div>
+    <v-tooltip bottom color="primary">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn icon dark @click.stop="openPaypalMe()" v-on="on" v-bind="attrs">
+          <v-icon>mdi-paypal</v-icon>
+        </v-btn>
+      </template>
+      <span>Donate</span>
+    </v-tooltip>
+
+    <v-tooltip bottom color="primary">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn icon @click.stop="dark = !dark" dark v-on="on" v-bind="attrs">
+          <v-icon>{{ dark ? "mdi-brightness-7" : "mdi-brightness-4" }}</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ dark ? "Switch to light mode" : "Switch to dark mode" }}</span>
+    </v-tooltip>
   </v-app-bar>
 </template>
 
@@ -56,6 +61,10 @@ export default {
           return false;
         } else return true;
       } else return false;
+    },
+    openPaypalMe() {
+      console.log(process.env.VUE_APP_Paypal_Me_Link);
+      window.open(process.env.VUE_APP_Paypal_Me_Link, "__blank");
     },
   },
   watch: {

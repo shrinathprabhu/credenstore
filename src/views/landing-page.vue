@@ -22,7 +22,7 @@
         </v-row>
       </v-container>
     </v-main>
-    <v-footer> Guidelines </v-footer>
+    <app-footer />
   </v-app>
 </template>
 
@@ -30,12 +30,14 @@
 import LandingDescription from "../components/landing/landing-description.vue";
 import CardRouter from "../components/landing/card-router.vue";
 import AppBar from "../components/appbar.vue";
+import AppFooter from "../components/app-footer.vue";
 export default {
   name: "landing-page",
   components: {
     LandingDescription,
     CardRouter,
     AppBar,
+    AppFooter,
   },
   data: () => ({}),
   methods: {},
