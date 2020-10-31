@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <app-bar title="Credenshare Store" />
+    <app-bar title="Credenstore Store" />
     <v-main style="width: 100% !important">
       <v-container class="mt-5">
         <v-row class="justify-center">

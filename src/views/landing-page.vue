@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <app-bar title="Credenshare" />
+    <app-bar title="Credenstore" />
     <v-main>
       <v-container>
         <landing-description />

@@ -12,9 +12,9 @@
           :style="$vuetify.theme.dark ? 'color: white' : 'color: #757575'"
         >
           Need a way to store your credentials securely on cloud? Need a way to
-          share them to your co-workers? Presenting you Credenshare, a web app
-          where you can store and share your credentials the secure way. No
-          middleware servers involved
+          retrieve them from any device securely? Presenting you Credenstore, a
+          web app where you can store and retrieve your credentials the secure
+          way. No middleware servers involved
         </span>
       </v-col>
     </v-row>
