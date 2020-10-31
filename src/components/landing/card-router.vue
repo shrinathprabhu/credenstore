@@ -7,7 +7,7 @@
         shaped
         height="150px"
         class="pa-3 text-center"
-        width="180px"
+        width="160px"
         style="cursor: pointer"
         :style="
           $vuetify.theme.dark ? 'border-color: white' : 'border-color: #757575'

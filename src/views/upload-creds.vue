@@ -4,7 +4,7 @@
     <v-main style="width: 100% !important">
       <v-container class="mt-5">
         <v-row class="justify-center">
-          <v-col cols="8">
+          <v-col sm="8" cols="12">
             <form>
               <v-text-field
                 readonly
@@ -25,7 +25,8 @@
                         mdi-content-copy
                       </v-icon>
                     </template>
-                    <span>Click to copy store id</span>
+                    <span v-if="idTooltipMessage">{{ idTooltipMessage }}</span>
+                    <span v-else>Click to copy store id</span>
                   </v-tooltip>
                 </template>
               </v-text-field>
@@ -227,6 +228,7 @@ export default {
     linkToRetrieve: "",
     idToRetrieve: "",
     showDialog: false,
+    idTooltipMessage: "",
   }),
   methods: {
     setPassword(v) {
@@ -376,13 +378,35 @@ export default {
         }
       }
     },
-    copyToClipboard(value) {
-      if (!navigator.clipboard) {
+    fallbackCopyToClipboard(value) {
+      try {
+        let textArea = document.createElement("textarea");
+        textArea.value = value;
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        let successful = document.execCommand("copy");
+        textArea.remove();
+        if (successful) {
+          this.idTooltipMessage = "Copied to clipboard";
+        } else {
+          this.idTooltipMessage = "Failed to copy";
+        }
+      } catch (e) {
+        console.error(e);
         this.showSnackbar(
           true,
           false,
           "Copying to clipboard is not supported in your browser"
         );
+      }
+    },
+    copyToClipboard(value) {
+      if (!navigator.clipboard) {
+        this.fallbackCopyToClipboard(value);
       } else {
         navigator.clipboard
           .writeText(value)

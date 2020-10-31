@@ -1,6 +1,9 @@
 <template>
   <v-app>
     <app-bar title="Credenstore Retrieve" />
+    <v-main>
+      <v-container></v-container>
+    </v-main>
   </v-app>
 </template>
 

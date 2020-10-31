@@ -11,8 +11,9 @@
             description="Encrypt your credentials and store it on cloud"
             navigateTo="store"
           ></card-router>
+          <div v-if="!$vuetify.breakpoint.mobile" class="ml-10"></div>
+          <div v-if="$vuetify.breakpoint.mobile" class="ml-3"></div>
           <card-router
-            crClass="ml-10"
             icon="mdi-key-variant"
             name="Retrieve Credentials"
             description="Download your credentials from cloud and decrypt it"
@@ -21,6 +22,7 @@
         </v-row>
       </v-container>
     </v-main>
+    <v-footer> Guidelines </v-footer>
   </v-app>
 </template>
 
