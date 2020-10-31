@@ -33,25 +33,26 @@
 <script>
 export default {
   name: "secret-field",
-  props: ["label", "hint", "state"],
+  props: ["label", "hint", "state", "lockIcon", "lockOpenIcon"],
   data: () => ({
     secretType: "password",
     secretIcon: "mdi-lock",
     secretMessage: "Click to show password",
     secret: "",
   }),
-  mounted: function () {
+  mounted() {
     this.$refs[this.label].$refs.input.onpaste = (e) => e.preventDefault();
+    this.secretIcon = this.lockIcon || "mdi-lock";
   },
   methods: {
     togglePasswordType() {
       if (this.secretType === "password") {
         this.secretType = "text";
-        this.secretIcon = "mdi-lock-open";
+        this.secretIcon = this.lockOpenIcon || "mdi-lock-open";
         this.secretMessage = "Click to hide password";
       } else {
         this.secretType = "password";
-        this.secretIcon = "mdi-lock";
+        this.secretIcon = this.lockIcon || "mdi-lock";
         this.secretMessage = "Click to show password";
       }
     },

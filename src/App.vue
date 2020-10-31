@@ -19,7 +19,7 @@
 export default {
   name: "App",
 
-  mounted: function () {
+  mounted() {
     document.title = "Credenstore";
   },
 };

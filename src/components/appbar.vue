@@ -40,7 +40,7 @@ export default {
   data: () => ({
     dark: false,
   }),
-  mounted: function () {
+  mounted() {
     this.dark = this.strToBool(localStorage.getItem("dark"));
     document.title = this.title;
   },

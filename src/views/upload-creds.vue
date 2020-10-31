@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <app-bar title="Credenstore Store" />
-    <v-main style="width: 100% !important">
+    <v-main>
       <v-container class="mt-5">
         <v-row class="justify-center">
           <v-col sm="8" cols="12">
@@ -10,7 +10,7 @@
                 readonly
                 dense
                 outlined
-                label="Store Id"
+                label="Store ID"
                 :value="uniqueId"
               >
                 <template slot="append">
@@ -25,20 +25,19 @@
                         mdi-content-copy
                       </v-icon>
                     </template>
-                    <span v-if="idTooltipMessage">{{ idTooltipMessage }}</span>
-                    <span v-else>Click to copy store id</span>
+                    <span>Click to copy store id</span>
                   </v-tooltip>
                 </template>
               </v-text-field>
               <secret-field
-                label="Enter encryption password"
+                label="Encryption password"
                 @change="setPassword"
                 hint="Use combination of letters, numbers and symbols"
                 :state="passwordState"
               />
               <div class="mb-2"></div>
               <secret-field
-                label="Re-enter encryption password"
+                label="Confirm encryption password"
                 @change="setConfirmPassword"
                 hint="Repeat the password same as above"
                 :state="confirmPasswordState"
@@ -69,9 +68,9 @@
               ></v-file-input>
               <hr class="mb-5" />
               <v-row class="justify-center">
-                <v-btn color="primary" dark @click.stop="encryptAndUpload"
-                  >Encrypt and upload</v-btn
-                >
+                <v-btn color="primary" dark @click.stop="encryptAndUpload">
+                  Encrypt and upload
+                </v-btn>
               </v-row>
             </form>
           </v-col>
@@ -215,8 +214,6 @@ export default {
       message: "",
     },
     snackbarState: {
-      error: false,
-      success: false,
       show: false,
       message: "",
     },
@@ -244,30 +241,42 @@ export default {
       obj.success = success;
       obj.message = message;
     },
-    showSnackbar(error, success, message, color) {
+    showSnackbar(message, color) {
       this.snackbarState.show = true;
-      this.snackbarState.error = error;
-      this.snackbarState.success = success;
       this.snackbarState.message = message;
       this.snackbarState.color = color || "error";
     },
     encryptAndUpload() {
-      if (this.password.length === 0) {
-        this.showSnackbar(true, false, "Enter password to continue");
+      if (!this.password.length) {
+        if (!this.passwordState.dirty) {
+          this.setPasswordState(
+            this.passwordState,
+            true,
+            false,
+            "Please enter a password"
+          );
+        }
+        this.showSnackbar("Enter password to continue");
       } else if (this.passwordState.error) {
-        this.showSnackbar(true, false, "Resolve password issues to continue");
-      } else if (!this.confirmPassword.length === 0) {
-        this.showSnackbar(true, false, "Confirm password to continue");
+        this.showSnackbar("Resolve password issues to continue");
+      } else if (!this.confirmPassword.length) {
+        if (!this.confirmPasswordState.dirty) {
+          this.setPasswordState(
+            this.confirmPasswordState,
+            true,
+            false,
+            "Confirm password to continue"
+          );
+        }
+        this.showSnackbar("Confirm password to continue");
       } else if (this.confirmPasswordState.error) {
-        this.showSnackbar(
-          true,
-          false,
-          "Resolve password confirmation issues to continue"
-        );
+        this.showSnackbar("Resolve password confirmation issues to continue");
+      } else if (this.password !== this.confirmPassword) {
+        this.showSnackbar("Passwords must match");
       } else {
         this.showOverlay = true;
         if (this.creds) {
-          this.overlayText = "Encrpyting credentials...";
+          this.overlayText = "Encrypting credentials...";
           hideCreds(this.creds, this.password)
             .then((encryptedCreds) => {
               this.overlayText = "Credentials encrypted.";
@@ -276,17 +285,13 @@ export default {
             .catch((e) => {
               console.error(e);
               this.showOverlay = false;
-              this.showSnackbar(
-                false,
-                false,
-                "Failed to encrypt data. Try again"
-              );
+              this.showSnackbar("Failed to encrypt data. Try again");
             });
-        }
-        if (this.credsFile) {
+        } else if (this.credsFile) {
           this.overlayText = "Extracting file content...";
           extractFileContent(this.credsFile).then((file) => {
             this.overlayText = "Encrypting file content...";
+
             hideCreds(file.content, this.password)
               .then((encryptedCreds) => {
                 this.overlayText = "File content encrypted.";
@@ -295,11 +300,7 @@ export default {
               .catch((e) => {
                 console.error(e);
                 this.showOverlay = false;
-                this.showSnackbar(
-                  false,
-                  false,
-                  "Failed to encrypt data. Try again"
-                );
+                this.showSnackbar("Failed to encrypt data. Try again");
               });
           });
         }
@@ -323,12 +324,6 @@ export default {
         .set(uploadData)
         .then(() => {
           this.showOverlay = false;
-          // this.showSnackbar(
-          //   false,
-          //   false,
-          //   `Encrypted ${uploadType} uploaded to cloud`,
-          //   "success"
-          // );
           this.displayRetrievalInfo();
           this.clearFields();
         })
@@ -336,8 +331,6 @@ export default {
           console.error(err);
           this.showOverlay = false;
           this.showSnackbar(
-            false,
-            false,
             "Couldn't upload encrypted credentials to cloud. Try again"
           );
         });
@@ -391,15 +384,13 @@ export default {
         let successful = document.execCommand("copy");
         textArea.remove();
         if (successful) {
-          this.idTooltipMessage = "Copied to clipboard";
+          this.showSnackbar("Copied to clipboard", "success");
         } else {
-          this.idTooltipMessage = "Failed to copy";
+          this.showSnackbar("Failed to copy. Try again");
         }
       } catch (e) {
         console.error(e);
         this.showSnackbar(
-          true,
-          false,
           "Copying to clipboard is not supported in your browser"
         );
       }
@@ -411,15 +402,11 @@ export default {
         navigator.clipboard
           .writeText(value)
           .then(() => {
-            this.showSnackbar(false, true, "Copied to clipboard", "success");
+            this.showSnackbar("Copied to clipboard", "success");
           })
           .catch((e) => {
             console.error(e);
-            this.showSnackbar(
-              true,
-              false,
-              "Copying to clipboard failed. Try again"
-            );
+            this.showSnackbar("Failed to copy. Try again");
           });
       }
     },
@@ -438,7 +425,7 @@ export default {
       this.clearFileInput();
     },
   },
-  mounted: function () {
+  mounted() {
     this.uniqueId = shortid();
   },
   watch: {
