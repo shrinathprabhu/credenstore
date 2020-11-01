@@ -82,12 +82,14 @@
         </template>
       </v-snackbar>
     </v-main>
+    <app-footer />
     <overlay-loader v-if="showOverlay" :loadingText="overlayText" />
   </v-app>
 </template>
 
 <script>
 import AppBar from "../components/appbar.vue";
+import AppFooter from "../components/app-footer.vue";
 import SecretField from "../components/secret-field.vue";
 import OverlayLoader from "../components/overlay-loader.vue";
 import firebase from "../utils/firebase";
@@ -97,6 +99,7 @@ export default {
   name: "download-creds",
   components: {
     AppBar,
+    AppFooter,
     SecretField,
     OverlayLoader,
   },

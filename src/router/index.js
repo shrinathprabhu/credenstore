@@ -12,21 +12,23 @@ const routes = [
   },
   {
     path: '/store',
-    name: 'Store creds page',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import('../views/upload-creds.vue')
+    name: 'Store creds',
+    component: () => import(/* webpackChunkName: "store-creds" */'../views/upload-creds.vue')
   },
   {
     path: '/retrieve',
-    name: 'Retrieve creds page',
-    component: () => import('../views/download-creds.vue')
+    name: 'Retrieve creds',
+    component: () => import(/* webpackChunkName: "retrieve-creds" */'../views/download-creds.vue')
   },
   {
     path: '/retrieve/:id',
     name: 'Retrieve creds page with id',
-    component: () => import('../views/download-creds.vue')
+    component: () => import(/* webpackChunkName: "retrieve-creds" */'../views/download-creds.vue')
+  },
+  {
+    path: '/terms-of-use',
+    name: 'Terms of use',
+    component: () => import(/* webpackChunkName: "terms-of-use" */'../views/terms-of-use.vue')
   },
   {
     path: '*',
