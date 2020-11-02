@@ -314,9 +314,9 @@ export default {
       this.overlayText = `Uploading encrypted ${uploadType} to cloud...`;
       let uploadData = {};
       uploadData.encryptedCreds = encryptedCreds;
+      uploadData.created_at = new Date();
       if (file) {
         uploadData.file = true;
-        uploadData.created_at = new Date();
         uploadData.metadata = {
           name: file.name,
           type: file.type,
