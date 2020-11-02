@@ -316,6 +316,7 @@ export default {
       uploadData.encryptedCreds = encryptedCreds;
       if (file) {
         uploadData.file = true;
+        uploadData.created_at = new Date();
         uploadData.metadata = {
           name: file.name,
           type: file.type,
