@@ -24,7 +24,7 @@
           <v-icon>mdi-paypal</v-icon>
         </v-btn>
       </template>
-      <span>Donate</span>
+      <span>Buy me a coffee</span>
     </v-tooltip>
 
     <v-tooltip bottom color="primary">
