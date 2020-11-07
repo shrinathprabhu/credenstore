@@ -4,7 +4,12 @@
       <v-container>
         <v-row class="justify-center">
           <v-col sm="9" cols="12">
-            <a class="text-h6" @click.stop="$router.go(-1)">Go Back</a>
+            <a
+              class="text-h6"
+              @click.stop="$router.go(-1)"
+              style="color: #53b883"
+              >Go Back</a
+            >
             <h3 class="text-h4 mt-8">Terms of Use</h3>
             <p class="text-subtitle-1 mt-5">Last updated: Nov 01 2020</p>
             <p class="text-subtitle-1 mt-5">
@@ -12,7 +17,7 @@
               using
               <a
                 href="https://credenstore.web.app"
-                style="text-decoration: none"
+                style="text-decoration: none; color: #53b883"
               >
                 Credenstore
               </a>

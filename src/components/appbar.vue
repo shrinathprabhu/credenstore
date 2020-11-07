@@ -10,7 +10,7 @@
         contain
         src="@/assets/logo.png"
         transition="scale-transition"
-        width="32"
+        width="40"
       />
 
       <h3 class="text-h5 ml-3">{{ title }}</h3>
@@ -46,7 +46,7 @@ export default {
     dark: false,
   }),
   mounted() {
-    this.dark = this.strToBool(localStorage.getItem("dark")) || true;
+    this.dark = this.strToBool(localStorage.getItem("dark"));
     document.title = this.title;
   },
   methods: {
@@ -59,8 +59,9 @@ export default {
       if (str) {
         if (str === "false" || str === "0") {
           return false;
-        } else return true;
-      } else return false;
+        }
+      }
+      return true;
     },
     openPaypalMe() {
       console.log(process.env.VUE_APP_Paypal_Me_Link);

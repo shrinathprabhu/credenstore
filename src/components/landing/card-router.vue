@@ -19,7 +19,7 @@
         ripple
       >
         <div class="mt-2">
-          <v-icon v-if="icon" size="80px">{{ icon }}</v-icon>
+          <v-icon v-if="icon" size="80px" color="accent">{{ icon }}</v-icon>
         </div>
         <div class="mt-2">
           <span class="subtitle-2">{{ name }}</span>
