@@ -32,6 +32,7 @@
               <secret-field
                 label="Encryption password"
                 @change="setPassword"
+                :prefill="prefill"
                 hint="Use combination of letters, numbers and symbols"
                 :state="passwordState"
               />
@@ -39,9 +40,19 @@
               <secret-field
                 label="Confirm encryption password"
                 @change="setConfirmPassword"
+                :prefill="prefill"
                 hint="Repeat the password same as above"
                 :state="confirmPasswordState"
               />
+              <v-row class="justify-center mb-5">
+                <v-btn
+                  color="primary"
+                  dark
+                  @click.stop="autofillStrongPassword"
+                >
+                  Generate password
+                </v-btn>
+              </v-row>
               <hr class="mb-8 mt-1" />
               <v-textarea
                 outlined
@@ -229,6 +240,7 @@ export default {
     idToRetrieve: "",
     showDialog: false,
     idTooltipMessage: "",
+    prefill: "",
   }),
   methods: {
     setPassword(v) {
@@ -433,6 +445,13 @@ export default {
     },
     hasWhiteSpace(str) {
       return /\s/g.test(str);
+    },
+    autofillStrongPassword() {
+      const strongPassword = this.generateStrongPassword();
+      this.password = strongPassword;
+      this.confirmPassword = strongPassword;
+      this.prefill = strongPassword;
+      console.log(strongPassword, Date.now());
     },
   },
   mounted() {

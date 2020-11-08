@@ -33,7 +33,7 @@
 <script>
 export default {
   name: "secret-field",
-  props: ["label", "hint", "state", "lockIcon", "lockOpenIcon"],
+  props: ["label", "hint", "state", "lockIcon", "lockOpenIcon", "prefill"],
   data: () => ({
     secretType: "password",
     secretIcon: "mdi-lock",
@@ -54,6 +54,16 @@ export default {
         this.secretType = "password";
         this.secretIcon = this.lockIcon || "mdi-lock";
         this.secretMessage = "Click to show password";
+      }
+    },
+  },
+  watch: {
+    prefill() {
+      if (this.prefill && this.prefill.length) {
+        this.secret = this.prefill;
+        this.secretType = "text";
+        this.secretIcon = this.lockOpenIcon || "mdi-lock-open";
+        this.secretMessage = "Click to hide password";
       }
     },
   },
