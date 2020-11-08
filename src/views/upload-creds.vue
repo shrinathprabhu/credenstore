@@ -431,6 +431,9 @@ export default {
       this.creds = "";
       this.clearFileInput();
     },
+    hasWhiteSpace(str) {
+      return /\s/g.test(str);
+    },
   },
   mounted() {
     this.uniqueId = shortid();
@@ -446,6 +449,13 @@ export default {
           true,
           false,
           "Please enter a password"
+        );
+      } else if (this.hasWhiteSpace(this.password)) {
+        this.setPasswordState(
+          this.passwordState,
+          true,
+          false,
+          "Password should not contain spaces"
         );
       } else if (this.password.toLowerCase() === this.uniqueId.toLowerCase()) {
         this.setPasswordState(
