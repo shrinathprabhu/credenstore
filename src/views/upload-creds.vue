@@ -449,7 +449,9 @@ export default {
     autofillStrongPassword() {
       const strongPassword = this.generateStrongPassword();
       this.password = strongPassword;
+      this.passwordState.dirty = true;
       this.confirmPassword = strongPassword;
+      this.confirmPasswordState.dirty = true;
       this.prefill = strongPassword;
       console.log(strongPassword, Date.now());
     },
