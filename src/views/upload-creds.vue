@@ -290,7 +290,7 @@ export default {
               this.showOverlay = false;
               this.showSnackbar("Failed to encrypt data. Try again");
             });
-        } else if (this.credsFile) {
+        } else if (this.credsFile.name) {
           this.overlayText = "Extracting file content...";
           extractFileContent(this.credsFile).then((file) => {
             this.overlayText = "Encrypting file content...";
@@ -306,6 +306,9 @@ export default {
                 this.showSnackbar("Failed to encrypt data. Try again");
               });
           });
+        } else {
+          this.showOverlay = false;
+          this.showSnackbar("Enter content or upload file to continue");
         }
       }
     },
