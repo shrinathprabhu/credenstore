@@ -78,6 +78,41 @@
                 @change.native="captureFilePath"
               ></v-file-input>
               <hr class="mb-5" />
+              <v-row class="mx-2">
+                <v-checkbox
+                  label="Set expiry"
+                  dense
+                  inset
+                  color="accent"
+                  v-model="canExpire"
+                />
+                <v-spacer />
+                <v-text-field
+                  label="Expires after"
+                  class="mt-3 shrink"
+                  style="width: 150px"
+                  type="number"
+                  :min="expiryRules.min"
+                  :max="expiryRules.max"
+                  dense
+                  outlined
+                  :disabled="!canExpire"
+                  v-model="expiresAfter"
+                  :error-messages="expiryError"
+                />
+                <v-select
+                  class="shrink ml-3 mt-3"
+                  dense
+                  outlined
+                  label="Time"
+                  :disabled="!canExpire"
+                  v-model="expiryUnit"
+                  style="width: 150px"
+                  :items="['minutes', 'hours', 'days', 'weeks', 'months']"
+                >
+                </v-select>
+              </v-row>
+              <hr class="mb-5" />
               <v-row class="justify-center">
                 <v-btn color="primary" dark @click.stop="encryptAndUpload">
                   Encrypt and upload
@@ -193,6 +228,7 @@ import { extractFileContent } from "../utils/file";
 import shortid from "shortid";
 import { hideCreds } from "../utils/triplesec";
 import firebase from "../utils/firebase";
+import { firestore } from "firebase/app";
 export default {
   name: "upload-creds",
   components: {
@@ -241,6 +277,14 @@ export default {
     showDialog: false,
     idTooltipMessage: "",
     prefill: "",
+    canExpire: false,
+    expiresAfter: "",
+    expiryRules: {
+      min: "",
+      max: "",
+    },
+    expiryError: "",
+    expiryUnit: "",
   }),
   methods: {
     setPassword(v) {
@@ -290,12 +334,16 @@ export default {
         this.showSnackbar("Passwords must match");
       } else {
         this.showOverlay = true;
+        let expiry = null;
+        if (this.canExpire && !this.expiryError) {
+          expiry = this.getExpiry();
+        }
         if (this.creds) {
           this.overlayText = "Encrypting credentials...";
           hideCreds(this.creds, this.password)
             .then((encryptedCreds) => {
               this.overlayText = "Credentials encrypted.";
-              this.upload(encryptedCreds);
+              this.upload(encryptedCreds, null, expiry);
             })
             .catch((e) => {
               console.error(e);
@@ -310,7 +358,7 @@ export default {
             hideCreds(file.content, this.password)
               .then((encryptedCreds) => {
                 this.overlayText = "File content encrypted.";
-                this.upload(encryptedCreds, file);
+                this.upload(encryptedCreds, file, expiry);
               })
               .catch((e) => {
                 console.error(e);
@@ -324,7 +372,7 @@ export default {
         }
       }
     },
-    upload(encryptedCreds, file) {
+    upload(encryptedCreds, file, expiry) {
       let uploadType = file ? "file content" : "credentials";
       this.overlayText = `Uploading encrypted ${uploadType} to cloud...`;
       let uploadData = {};
@@ -335,6 +383,9 @@ export default {
           name: file.name,
           type: file.type,
         };
+      }
+      if (expiry) {
+        uploadData.expires_at = expiry;
       }
       firebase
         .collection("credentials")
@@ -453,6 +504,51 @@ export default {
       this.confirmPasswordState.dirty = true;
       this.prefill = strongPassword;
     },
+    validateExpiry(event) {
+      if (this.canExpire) {
+        if (this.expiresAfter < this.expiryRules.min) {
+          if (event === "unit-change") {
+            this.expiresAfter = this.expiryRules.min;
+          } else {
+            this.expiryError =
+              "Value should not be less than " + this.expiryRules.min;
+          }
+        } else if (this.expiresAfter > this.expiryRules.max) {
+          if (event === "unit-change") {
+            this.expiresAfter = this.expiryRules.max;
+          } else {
+            this.expiryError =
+              "Value should not be greater than " + this.expiryRules.max;
+          }
+        } else {
+          this.expiryError = "";
+        }
+      }
+    },
+    getExpiry() {
+      let now = Date.now();
+      let msUnit = 0;
+      switch (this.expiryUnit) {
+        case "minutes":
+          msUnit = 60000;
+          break;
+        case "hours":
+          msUnit = 60 * 60000;
+          break;
+        case "days":
+          msUnit = 24 * 60 * 60000;
+          break;
+        case "weeks":
+          msUnit = 7 * 24 * 60 * 60000;
+          break;
+        case "months":
+          msUnit = 30 * 24 * 60 * 60000;
+          break;
+        default:
+          break;
+      }
+      return firestore.Timestamp.fromMillis(now + this.expiresAfter * msUnit);
+    },
   },
   mounted() {
     this.uniqueId = shortid();
@@ -513,6 +609,60 @@ export default {
           this.clearFileInput();
         }
       }
+    },
+    canExpire() {
+      if (!this.canExpire) {
+        this.expiresAfter = "";
+        this.expiryUnit = "";
+        this.expiryError = "";
+      } else {
+        this.expiresAfter = 1;
+        this.expiryUnit = "minutes";
+      }
+    },
+    expiresAfter() {
+      this.validateExpiry("expires-after-change");
+    },
+    expiryUnit() {
+      switch (this.expiryUnit) {
+        case "minutes":
+          this.expiryRules = {
+            min: 1,
+            max: 527040,
+          };
+          break;
+        case "hours":
+          this.expiryRules = {
+            min: 1,
+            max: 8784,
+          };
+          break;
+        case "weeks":
+          this.expiryRules = {
+            min: 1,
+            max: 52,
+          };
+          break;
+        case "days":
+          this.expiryRules = {
+            min: 1,
+            max: 366,
+          };
+          break;
+        case "months":
+          this.expiryRules = {
+            min: 1,
+            max: 12,
+          };
+          break;
+        default:
+          this.expiryRules = {
+            min: "",
+            max: "",
+          };
+          break;
+      }
+      this.validateExpiry("unit-change");
     },
   },
 };

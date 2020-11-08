@@ -211,9 +211,17 @@ export default {
             }
           })
           .catch((e) => {
-            console.error(e);
+            console.error(e.message);
             this.showOverlay = false;
-            this.showSnackbar("Something went wrong. Try again");
+            if (e.message === "Missing or insufficient permissions.") {
+              if (this.$route.params.id) {
+                this.showSnackbar("Retrieval link expired");
+              } else {
+                this.showSnackbar("Retrieval ID expired");
+              }
+            } else {
+              this.showSnackbar("Something went wrong. Try again");
+            }
           });
       }
     },
