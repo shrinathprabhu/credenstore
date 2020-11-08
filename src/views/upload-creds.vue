@@ -492,6 +492,7 @@ export default {
       this.uniqueId = shortid();
       this.creds = "";
       this.clearFileInput();
+      this.canExpire = false;
     },
     hasWhiteSpace(str) {
       return /\s/g.test(str);
