@@ -64,7 +64,6 @@ export default {
       return true;
     },
     openPaypalMe() {
-      console.log(process.env.VUE_APP_Paypal_Me_Link);
       window.open(process.env.VUE_APP_Paypal_Me_Link, "__blank");
     },
   },

@@ -329,7 +329,6 @@ export default {
       this.overlayText = `Uploading encrypted ${uploadType} to cloud...`;
       let uploadData = {};
       uploadData.encryptedCreds = encryptedCreds;
-      uploadData.created_at = new Date();
       if (file) {
         uploadData.file = true;
         uploadData.metadata = {
@@ -453,7 +452,6 @@ export default {
       this.confirmPassword = strongPassword;
       this.confirmPasswordState.dirty = true;
       this.prefill = strongPassword;
-      console.log(strongPassword, Date.now());
     },
   },
   mounted() {
