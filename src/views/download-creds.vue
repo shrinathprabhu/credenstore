@@ -1,6 +1,10 @@
 <template>
   <v-app>
-    <app-bar title="Credenstore Retrieve" />
+    <app-bar
+      :title="
+        $vuetify.breakpoint.mobile ? 'C Retrieve' : 'Credenstore Retrieve'
+      "
+    />
     <v-main>
       <v-container class="mt-5">
         <v-row class="justify-center">
@@ -72,6 +76,7 @@
         v-model="snackbarState.show"
         timeout="5000"
         :color="snackbarState.color"
+        bottom
       >
         <strong>{{ snackbarState.message }}</strong>
 

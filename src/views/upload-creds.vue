@@ -1,6 +1,8 @@
 <template>
   <v-app>
-    <app-bar title="Credenstore Store" />
+    <app-bar
+      :title="$vuetify.breakpoint.mobile ? 'C Store' : 'Credenstore Store'"
+    />
     <v-main>
       <v-container class="mt-5">
         <v-row class="justify-center">
@@ -90,7 +92,9 @@
                 <v-text-field
                   label="Expires after"
                   class="mt-3 shrink"
-                  style="width: 150px"
+                  :style="
+                    $vuetify.breakpoint.mobile ? 'width: 100px' : 'width: 150px'
+                  "
                   type="number"
                   :min="expiryRules.min"
                   :max="expiryRules.max"
@@ -107,7 +111,9 @@
                   label="Time"
                   :disabled="!canExpire"
                   v-model="expiryUnit"
-                  style="width: 150px"
+                  :style="
+                    $vuetify.breakpoint.mobile ? 'width:100px' : 'width: 150px'
+                  "
                   :items="['minutes', 'hours', 'days', 'weeks', 'months']"
                 >
                 </v-select>
@@ -203,6 +209,7 @@
         v-model="snackbarState.show"
         timeout="5000"
         :color="snackbarState.color"
+        bottom
       >
         <strong>{{ snackbarState.message }}</strong>
 
